@@ -1,4 +1,4 @@
-const PORT = 5000;
+const PORT = 3000;
 
 const express = require("express");
 const axios = require("axios");
@@ -49,6 +49,5 @@ app.get("/news", async (req, res) => {
 //   await browser.close();
 //   res.json(articles);
 // });
-
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
