@@ -6,69 +6,44 @@ const cheerio = require("cheerio");
 
 const app = express();
 
-// const articles = [];
-
-// const newspapers = [
-//   {
-//     name: "thetimes",
-//     address: "https://www.thetimes.co.uk/environment/climate-change",
-//     base: "",
-//   },
-//   {
-//     name: "guardian",
-//     address: "https://www.theguardian.com/environment/climate-crisis",
-//     base: "",
-//   },
-//   {
-//     name: "telegraph",
-//     address: "https://www.telegraph.co.uk/environment/climate-change",
-//     base: "",
-//   },
-// ];
-
-// newspapers.forEach((newspaper) => {
-//   axios.get(newspaper.address).then((response) => {
-//     const html = response.data;
-//     const $ = cheerio.load(html);
-
-//     // const articles = [];
-
-//     $("a:contains('climate')").each(function () {
-//       const title = $(this).text();
-//       const url = $(this).attr("href");
-
-//       articles.push({
-//         title,
-//         url,
-//         source: newspaper.name,
-//       });
-//     });
-//   });
-// });
-
-// app.get("/news", (req, res) => {
-//   res.json(articles);
-// });
-
 app.get("/news", async (req, res) => {
   try {
-    const { data } = await axios.get(
-      "https://www.theguardian.com/environment/climate-crisis"
-    );
-    const $ = cheerio.load(data);
+    const urls = [
+      {
+        name: "thetimes",
+        address: "https://www.thetimes.co.uk/environment/climate-change",
+        base: "",
+      },
+      {
+        name: "guardian",
+        address: "https://www.theguardian.com/environment/climate-crisis",
+        base: "",
+      },
+      {
+        name: "telegraph",
+        address: "https://www.telegraph.co.uk/environment",
+        base: "",
+      },
+    ];
 
     const articles = [];
 
-    $("a")
-      .filter((index, element) =>
-        $(element).text().toLowerCase().includes("climate")
-      )
-      .each((index, element) => {
-        articles.push({
-          title: $(element).text().trim(),
-          url: $(element).attr("href"),
+    for (const url of urls) {
+      const { data } = await axios.get(url.address);
+      const $ = cheerio.load(data);
+
+      $("a")
+        .filter((index, element) =>
+          $(element).text().toLowerCase().includes("climate")
+        )
+        .each((index, element) => {
+          articles.push({
+            title: $(element).text().trim(),
+            url: $(element).attr("href"),
+            source: url.name
+          });
         });
-      });
+    }
     res.json(articles);
   } catch (error) {
     console.log(error);
